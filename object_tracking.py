@@ -6,6 +6,10 @@ This script is used to detect and object using the ORB algorithm, and track it o
 Authors: Héctor Camacho Zamora
 Organisation: UDEM
 First created on Monday 29 April 2024
+
+
+python3 object_tracking.py --img_obj ca2.jpeg --video video2.mp4
+
 """
 
 # Importing the necessary libraries
