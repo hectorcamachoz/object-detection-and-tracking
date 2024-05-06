@@ -65,6 +65,7 @@ def load_video(path: str) -> cv2.VideoCapture:
     if not vd.isOpened():
         raise FileNotFoundError(f"Video at path {path} not found.") # Raise an error if the video is not found
     return vd
+
 def detect_features(image: np.ndarray) -> tuple:
     """
     Detect and compute ORB features and descriptors in the image.
@@ -117,6 +118,7 @@ def draw_matches(image1: np.ndarray, keypoints1: list, image2: np.ndarray,
     
     return cv2.drawMatchesKnn(image1, keypoints1, image2, 
                               keypoints2, matches, None, flags=2) # Draw matches
+
 def draw_keypoints(image: np.ndarray, keypoints2: list) -> np.ndarray:
     """
     Draw keypoints as circles on the image.
@@ -146,7 +148,6 @@ def find_centroid(matched_image: np.ndarray, good_matches: list, keypoints2: lis
     """
     sum_x = 0
     sum_y = 0
-    i = 0
     cx_list = []
     cy_list = []
     num_matches = len(good_matches)
@@ -156,7 +157,6 @@ def find_centroid(matched_image: np.ndarray, good_matches: list, keypoints2: lis
         sum_x += kp2[0]
         sum_y += kp2[1]
         
-        i += 1
 
     if num_matches > 0:
         centroid_x = sum_x / num_matches
@@ -202,6 +202,7 @@ def draw_rectangle(image: np.ndarray, centroid_x: int, centroid_y: int) -> np.nd
                            (int(centroid_x) + 100, int(centroid_y) + 50), 
                            (0, 0, 255), 2)
     return frame
+
 def draw_line(img: np.ndarray) -> np.ndarray:
     """
     Draw a line on the input image from the top to the bottom center.
@@ -267,25 +268,21 @@ def run_pipeline():
 """
     args = parse_args() # Parse command line arguments
     obj = load_and_resize_image(args.img_obj) # Load and resize the image
-    #obj = cv2.cvtColor(obj, cv2.COLOR_BGR2GRAY)
     video = load_video(args.video)
     keypoints1, descriptors1 = detect_features(obj) # Detect features in the image 1
     while True:
         ret, frame = video.read()
         if not ret:
             break
-       # frame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
         frame = draw_line(frame)
         keypoints2, descriptors2 = detect_features(frame)
         good_matches = match_features(descriptors1, descriptors2)
         matched_image = draw_keypoints(frame, keypoints2)
-        #image_with_matches = draw_matches(obj, keypoints1, frame, keypoints2, good_matches)
         matched_image, centroid_x, centroid_y = find_centroid(frame, good_matches, keypoints2)
         matched_image = draw_rectangle(matched_image, centroid_x, centroid_y)
         matched_image = count_passes(matched_image, centroid_x, centroid_y)
         if matched_image is not None and centroid_x is not None and centroid_y is not None:
             cv2.imshow('Centroid', matched_image)
-            #cv2.imshow('matches', image_with_matches)
         if cv2.waitKey(1) & 0xFF == ord('q'):
             break
 
