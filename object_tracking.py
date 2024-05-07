@@ -222,6 +222,7 @@ def draw_line(img: np.ndarray) -> np.ndarray:
     
     frame = cv2.line(img, (center_x, 0), (center_x,height), (0, 255, 0), 2)
     return frame
+
 def count_passes(image: np.ndarray, centroid_x: int, centroid_y: int) -> np.ndarray:
     """
     Count the number of passes made by an object based on its centroid coordinates.
@@ -252,14 +253,14 @@ def count_passes(image: np.ndarray, centroid_x: int, centroid_y: int) -> np.ndar
     if centroid_x is None or centroid_y is None:
         return 0
     
-    if centroid_x < image.shape[1] // 2 and wh == True:
+    if centroid_x > image.shape[1] // 2 and wh == True:
         passes_to_right += 1
         wh = False
         matched_image = cv2.putText(image, f'Passes to right: {passes_to_right}', (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
         matched_image = cv2.putText(image, f'Passes to left: {passes_to_left}', (10, 60), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
         return matched_image
     
-    if centroid_x > image.shape[1] // 2 and wh == False:
+    if centroid_x < image.shape[1] // 2 and wh == False:
         passes_to_left += 1 
         matched_image = cv2.putText(image, f'Passes to right: {passes_to_right}', (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
         matched_image = cv2.putText(image, f'Passes to left: {passes_to_left}', (10, 60), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
